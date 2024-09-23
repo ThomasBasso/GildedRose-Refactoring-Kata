@@ -1,28 +1,28 @@
 package com.gildedrose;
 
-// Classe principale GildedRose qui gère les mises à jour des items.
+// Main class GildedRose that manages the updates of items.
 public class GildedRose {
-    private UpdatableItem[] updatableItems;  // Utilisation du polymorphisme pour simplifier la logique.
+    private final UpdatableItem[] updatableItems;  // Using polymorphism to simplify logic.
 
-    // Constructeur de la classe GildedRose, qui reçoit un tableau d'UpdatableItems.
+    // Constructor for the GildedRose class, which receives an array of UpdatableItems.
     public GildedRose(UpdatableItem[] updatableItems) {
         this.updatableItems = updatableItems;
     }
 
-    // Méthode updateQuality qui délègue la mise à jour de chaque item à sa propre classe.
+    // updateQuality method that delegates the update of each item to its own class.
     public void updateQuality() {
         for (UpdatableItem updatableItem : updatableItems) {
-            updatableItem.update();  // Chaque type d'item implémente sa propre logique de mise à jour.
+            updatableItem.update();  // Each item type implements its own update logic.
         }
     }
 }
 
-// Interface commune pour tous les types d'items, permettant une méthode de mise à jour unifiée.
+// Common interface for all item types, allowing for a unified update method.
 interface UpdatableItem {
     void update();
 }
 
-// Classe de base abstraite pour partager du comportement commun entre différents types d'items.
+// Abstract base class to share common behavior among different item types.
 abstract class BaseItem implements UpdatableItem {
     protected Item item;
 
@@ -30,12 +30,12 @@ abstract class BaseItem implements UpdatableItem {
         this.item = item;
     }
 
-    // Méthode commune pour diminuer la valeur sellIn.
+    // Common method to decrease the sellIn value.
     protected void decreaseSellIn() {
         item.sellIn--;
     }
 
-    // Méthode commune pour vérifier que la qualité est dans les limites (0 à 50).
+    // Common method to ensure quality is within bounds (0 to 50).
     protected void ensureQualityIsWithinBounds() {
         if (item.quality < 0) {
             item.quality = 0;
@@ -44,13 +44,13 @@ abstract class BaseItem implements UpdatableItem {
         }
     }
 
-    // Méthode commune pour diminuer la qualité d'un item de manière classique.
+    // Common method to decrease an item's quality normally.
     protected void decreaseQuality() {
         item.quality--;
     }
 }
 
-// Implémentation de la mise à jour pour "Aged Brie" qui améliore sa qualité avec le temps.
+// Implementation of the update for "Aged Brie" which improves its quality over time.
 class AgedBrieItem extends BaseItem {
 
     public AgedBrieItem(Item item) {
@@ -60,18 +60,18 @@ class AgedBrieItem extends BaseItem {
     @Override
     public void update() {
         if (item.quality < 50) {
-            item.quality++;  // "Aged Brie" voit sa qualité augmenter avec le temps.
+            item.quality++;  // "Aged Brie" sees its quality increase over time.
         }
         decreaseSellIn();
 
         if (item.sellIn < 0 && item.quality < 50) {
-            item.quality++;  // Si la date de péremption est passée, la qualité augmente encore plus.
+            item.quality++;  // If the expiration date has passed, quality increases even more.
         }
         ensureQualityIsWithinBounds();
     }
 }
 
-// Implémentation de la mise à jour pour "Backstage passes".
+// Implementation of the update for "Backstage passes".
 class BackstagePassItem extends BaseItem {
 
     public BackstagePassItem(Item item) {
@@ -81,21 +81,21 @@ class BackstagePassItem extends BaseItem {
     @Override
     public void update() {
         if (item.sellIn > 10) {
-            item.quality++;  // La qualité augmente normalement.
+            item.quality++;  // Quality increases normally.
         } else if (item.sellIn > 5) {
-            item.quality += 2;  // Moins de 10 jours restants, la qualité augmente de 2.
+            item.quality += 2;  // Less than 10 days left, quality increases by 2.
         } else if (item.sellIn > 0) {
-            item.quality += 3;  // Moins de 5 jours restants, la qualité augmente de 3.
+            item.quality += 3;  // Less than 5 days left, quality increases by 3.
         } else {
-            item.quality = 0;  // Après le concert, la qualité tombe à 0.
+            item.quality = 0;  // After the concert, quality drops to 0.
         }
 
         decreaseSellIn();
-        ensureQualityIsWithinBounds();  // Assure que la qualité reste dans les limites acceptées.
+        ensureQualityIsWithinBounds();  // Ensures that quality remains within accepted limits.
     }
 }
 
-// Implémentation de la mise à jour pour "Sulfuras" (objet légendaire).
+// Implementation of the update for "Sulfuras" (legendary item).
 class SulfurasItem extends BaseItem {
 
     public SulfurasItem(Item item) {
@@ -104,12 +104,12 @@ class SulfurasItem extends BaseItem {
 
     @Override
     public void update() {
-        // "Sulfuras" est un objet légendaire, donc rien ne change : ni qualité, ni sellIn.
-        // On ne fait rien ici car la qualité de "Sulfuras" ne change jamais.
+        // "Sulfuras" is a legendary item, so nothing changes: neither quality nor sellIn.
+        // Do nothing here because "Sulfuras" quality never changes.
     }
 }
 
-// Implémentation de la mise à jour pour les objets "Conjured" (qualité se dégrade plus vite).
+// Implementation of the update for "Conjured" items (quality degrades faster).
 class ConjuredItem extends BaseItem {
 
     public ConjuredItem(Item item) {
@@ -119,18 +119,18 @@ class ConjuredItem extends BaseItem {
     @Override
     public void update() {
         if (item.quality > 0) {
-            item.quality -= 2;  // La qualité se dégrade deux fois plus vite.
+            item.quality -= 2;  // Quality degrades twice as fast.
         }
         decreaseSellIn();
 
         if (item.sellIn < 0 && item.quality > 0) {
-            item.quality -= 2;  // Après la date de péremption, la qualité se dégrade encore plus rapidement.
+            item.quality -= 2;  // After the expiration date, quality degrades even faster.
         }
-        ensureQualityIsWithinBounds();  // Assure que la qualité reste positive et dans les limites.
+        ensureQualityIsWithinBounds();  // Ensures that quality remains positive and within bounds.
     }
 }
 
-// Classe de base pour les items standards, utilisée par défaut si l'item n'a pas de comportement spécifique.
+// Base class for standard items, used by default if the item has no specific behavior.
 class StandardItem extends BaseItem {
 
     public StandardItem(Item item) {
@@ -139,17 +139,17 @@ class StandardItem extends BaseItem {
 
     @Override
     public void update() {
-        decreaseQuality();  // La qualité diminue normalement.
+        decreaseQuality();  // Quality decreases normally.
         decreaseSellIn();
 
         if (item.sellIn < 0) {
-            decreaseQuality();  // Après la date de péremption, la qualité diminue encore plus vite.
+            decreaseQuality();  // After the expiration date, quality decreases even faster.
         }
-        ensureQualityIsWithinBounds();  // Assure que la qualité reste dans les limites (0 à 50).
+        ensureQualityIsWithinBounds();  // Ensures that quality remains within limits (0 to 50).
     }
 }
 
-/* CODE DE DÉPART **
+/*  STARTING CODE **
 ********************
 class GildedRose {
     Item[] items;
